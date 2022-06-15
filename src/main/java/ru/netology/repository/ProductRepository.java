@@ -1,33 +1,51 @@
 package ru.netology.repository;
 
+import ru.netology.product.NotFoundException;
 import ru.netology.product.Product;
 
 public class ProductRepository {
-    private Product[] product = new Product[0];
+    private Product[] products = new Product[0];
 
     public void save(Product item) {
-        int length = product.length + 1;
+        int length = products.length + 1;
         Product[] tmp = new Product[length];
-        System.arraycopy(product, 0, tmp, 0, product.length);
+        System.arraycopy(products, 0, tmp, 0, products.length);
         int lastIndex = tmp.length - 1;
         tmp[lastIndex] = item;
-        product = tmp;
+        products = tmp;
     }
 
     public Product[] findAll() {
-        return product;
+        return products;
     }
 
-    public void removeById(int id) {
-        int length = product.length - 1;
-        Product[] tmp = new Product[length];
-        int index = 0;
-        for (Product item : product) {
-            if (item.getId() != id) {
-                tmp[index] = item;
-                index++;
+    public Product[] findByID(int id) {
+        Product[] result = new Product[1];
+        for (Product product : products) {
+            if (product.getId() == id) {
+                result[0] = product;
             }
         }
-        product = tmp;
+        if (result[0] == null) {
+            throw new NotFoundException("id " + id + " не найден");
+        } else return result;
+    }
+
+    public void removeByID(int id) {
+        try {
+            findByID(id);
+            int length = products.length - 1;
+            Product[] tmp = new Product[length];
+            int index = 0;
+            for (Product item : products) {
+                if (item.getId() != id) {
+                    tmp[index] = item;
+                    index++;
+                }
+                products = tmp;
+            }
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }

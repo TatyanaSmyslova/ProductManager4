@@ -3,6 +3,7 @@ package ru.netology.manager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.netology.product.Book;
+import ru.netology.product.NotFoundException;
 import ru.netology.product.Product;
 import ru.netology.product.Smartphone;
 import ru.netology.repository.ProductRepository;
@@ -10,6 +11,7 @@ import ru.netology.repository.ProductRepository;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProductManagerTest {
+    private int nonexistentID = 5;
     private ProductRepository repository = new ProductRepository();
     private ProductManager manager = new ProductManager(repository);
     private Book firstBook = new Book(1, "Название книги1", 1000, "Фамилия автора1");
@@ -47,7 +49,7 @@ class ProductManagerTest {
     }
 
     @Test
-    public void shouldFindBySmartphoneManufacturer() {
+    public void shouldFindSeveralBySmartphoneManufacturer() {
         Product[] expected = new Product[]{firstSmartphone, secondSmartphone};
         Product[] actual = manager.searchBy("Наименование производителя1");
         assertArrayEquals(expected, actual);
@@ -55,8 +57,43 @@ class ProductManagerTest {
 
     @Test
     public void shouldFindBySmartphoneTitle() {
-        Product[] expected = new Product[]{secondSmartphone};
-        Product[] actual = manager.searchBy("Наименование смартфона2");
+        Product[] expected = new Product[]{firstSmartphone};
+        Product[] actual = manager.searchBy("Наименование смартфона1");
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void shouldNotFindByString() {
+        Product[] expected = new Product[0];
+        Product[] actual = manager.searchBy("Фамилия автора2");
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void shouldFindByID() {
+        Product[] expected = new Product[]{secondBook};
+        Product[] actual = manager.findByID(2);
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void shouldNotFindByNonexistentID() {
+        assertThrows(NotFoundException.class, () -> manager.findByID(nonexistentID));
+    }
+
+    @Test
+    public void shouldRemoveByID() {
+        manager.removeByID(4);
+        Product[] expected = new Product[]{firstBook, secondBook, firstSmartphone};
+        Product[] actual = manager.getAll();
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void shouldNotRemoveByNonexistentID() {
+        manager.removeByID(nonexistentID);
+        Product[] expected = new Product[]{firstBook, secondBook, firstSmartphone, secondSmartphone};
+        Product[] actual = manager.getAll();
         assertArrayEquals(expected, actual);
     }
 }
