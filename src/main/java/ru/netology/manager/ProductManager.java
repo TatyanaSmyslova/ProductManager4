@@ -3,23 +3,26 @@ package ru.netology.manager;
 import ru.netology.product.Product;
 import ru.netology.repository.ProductRepository;
 
-
 public class ProductManager {
-    ProductRepository repository;
+    protected ProductRepository repository; // исправила
 
     public ProductManager(ProductRepository repository) {
+
         this.repository = repository;
     }
 
     public void add(Product item) {
+
         repository.save(item);
     }
 
     public Product[] getAll() {
+
         return repository.findAll();
     }
 
     public Product[] findByID(int id) {
+
         return repository.findByID(id);
     }
 
